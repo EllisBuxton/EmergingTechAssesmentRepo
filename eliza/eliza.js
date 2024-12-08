@@ -41,6 +41,16 @@ class Eliza {
                     "What would you do if you got $2?",
                     "If you got $2, then what would you do?"
                 ]
+            },
+            {
+                pattern: /.*\b(what|who|when|where|how|why)\s+(.*)/i,
+                response: [
+                    "Why do you ask?",
+                    "What do you think?",
+                    "Why does that interest you?",
+                    "What answer would please you most?",
+                    "What do you think about $2?"
+                ]
             }
         ];
 
