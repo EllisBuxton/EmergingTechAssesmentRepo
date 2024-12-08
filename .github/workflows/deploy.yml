@@ -3,7 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
+<<<<<<< HEAD
       - main
+=======
+      - main  # or master, depending on your default branch name
+>>>>>>> f9451858107538911d068bb0143715f5d5a49cfe
 
 permissions:
   contents: read
@@ -31,4 +35,8 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
+<<<<<<< HEAD
         uses: actions/deploy-pages@v4 
+=======
+        uses: actions/deploy-pages@v4
+>>>>>>> f9451858107538911d068bb0143715f5d5a49cfe
