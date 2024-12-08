@@ -14,6 +14,33 @@ class Eliza {
                     "Hi. How are you feeling today?",
                     "How do you do. What would you like to discuss?"
                 ]
+            },
+            {
+                pattern: /.*\b(i am|i'm)\s+(.*)/i,
+                response: [
+                    "How long have you been $2?",
+                    "Do you believe it is normal to be $2?",
+                    "Do you enjoy being $2?",
+                    "Why do you think you're $2?"
+                ]
+            },
+            {
+                pattern: /.*\b(i feel|i am feeling)\s+(.*)/i,
+                response: [
+                    "Tell me more about feeling $2.",
+                    "Do you often feel $2?",
+                    "When do you usually feel $2?",
+                    "What makes you feel $2?"
+                ]
+            },
+            {
+                pattern: /.*\b(i want|i need)\s+(.*)/i,
+                response: [
+                    "What would it mean to you if you got $2?",
+                    "Why do you want $2?",
+                    "What would you do if you got $2?",
+                    "If you got $2, then what would you do?"
+                ]
             }
         ];
 
@@ -57,11 +84,19 @@ class Eliza {
 
     // Add generateResponse method
     generateResponse(input) {
-        // Try to match input against patterns
+        if (input.match(/.*\b(goodbye|bye|quit|exit)\b.*/i)) {
+            return "Goodbye. It was nice talking to you.";
+        }
+
         for (const {pattern, response} of this.patterns) {
             const match = input.match(pattern);
             if (match) {
-                return response[Math.floor(Math.random() * response.length)];
+                let chosen = response[Math.floor(Math.random() * response.length)];
+                // Replace placeholders with captured groups
+                for (let i = 1; i < match.length; i++) {
+                    chosen = chosen.replace(`$${i}`, match[i]);
+                }
+                return chosen;
             }
         }
 
