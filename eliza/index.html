@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELIZA - Rogerian Psychotherapist</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -14,7 +15,7 @@
         <main>
             <div id="chat-history"></div>
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Type your message here...">
+                <input type="text" id="user-input" placeholder="Type your message here..." aria-label="Chat input">
                 <button id="send-button">Send</button>
             </div>
         </main>
@@ -22,5 +23,6 @@
             <p>Based on Joseph Weizenbaum's ELIZA (1966)</p>
         </footer>
     </div>
+    <script src="eliza.js"></script>
 </body>
 </html>
