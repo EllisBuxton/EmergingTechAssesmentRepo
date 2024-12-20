@@ -269,10 +269,13 @@ class Eliza {
         );
         topics.forEach(topic => this.conversationContext.mentionedTopics.add(topic));
         
+        // Reset emotional state each time
+        this.conversationContext.emotionalState = null;
+        
         // Track emotional state
         const emotions = {
-            positive: ['happy', 'glad', 'excited'],
-            negative: ['sad', 'angry', 'depressed']
+            positive: ['happy', 'glad', 'excited', 'relaxed', 'better'],
+            negative: ['sad', 'angry', 'depressed', 'troubled']
         };
         for (const [state, words] of Object.entries(emotions)) {
             if (words.some(word => input.toLowerCase().includes(word))) {
@@ -283,7 +286,13 @@ class Eliza {
 
     getFollowUpQuestion() {
         if (this.conversationContext.emotionalState === 'negative') {
-            return "Would you like to talk more about what's troubling you?";
+            const followUps = [
+                "Would you like to talk more about what's troubling you?",
+                "How long have you been feeling this way?",
+                "What do you think caused these feelings?",
+                "Is there something specific that's bothering you?"
+            ];
+            return followUps[Math.floor(Math.random() * followUps.length)];
         }
         if (this.conversationContext.mentionedTopics.has('family')) {
             return "How do your family relationships affect other areas of your life?";
