@@ -51,6 +51,110 @@ class Eliza {
                     "What answer would please you most?",
                     "What do you think about $2?"
                 ]
+            },
+            {
+                pattern: /.*\b(always|never)\b.*/i,
+                response: [
+                    "Can you think of a specific example?",
+                    "Are you sure that's always/never true?",
+                    "Is it really that absolute?",
+                    "Can you think of any exceptions?",
+                    "Perhaps there are some cases where that isn't true?"
+                ]
+            },
+            {
+                pattern: /.*\b(my mother|my father|my parents|mom|dad)\b.*/i,
+                response: [
+                    "Tell me more about your relationship with your $1.",
+                    "How do you feel about your $1?",
+                    "How does your relationship with your $1 affect your other relationships?",
+                    "What's your earliest memory of your $1?",
+                    "Has your relationship with your $1 changed over time?"
+                ]
+            },
+            {
+                pattern: /.*\b(depressed|sad|unhappy|miserable)\b.*/i,
+                response: [
+                    "I'm sorry to hear you're feeling this way. Can you tell me more about these feelings?",
+                    "How long have you been feeling like this?",
+                    "Do you know what might have triggered these feelings?",
+                    "Have you considered talking to a mental health professional about these feelings?",
+                    "What usually helps you when you feel this way?"
+                ]
+            },
+            {
+                pattern: /.*\b(angry|mad|furious|upset)\b.*/i,
+                response: [
+                    "What makes you feel so angry?",
+                    "When you feel this way, what do you usually do?",
+                    "Has anyone else noticed your anger?",
+                    "How do you typically handle your anger?",
+                    "What would help you feel calmer right now?"
+                ]
+            },
+            {
+                pattern: /.*\b(because|cause)\b.*/i,
+                response: [
+                    "Is that the real reason?",
+                    "What other reasons might there be?",
+                    "Does that reason explain anything else?",
+                    "What makes you think that's the cause?"
+                ]
+            },
+            {
+                pattern: /.*\b(dream|dreams|dreamt)\b.*/i,
+                response: [
+                    "What do you think that dream means?",
+                    "Do you often remember your dreams?",
+                    "How did that dream make you feel?",
+                    "What images from that dream stood out to you?",
+                    "Do you see any connection between your dreams and your life?"
+                ]
+            },
+            {
+                pattern: /.*\b(yes|yeah|yep)\b.*/i,
+                response: [
+                    "You seem quite certain about that.",
+                    "Can you elaborate on that?",
+                    "I see. Tell me more.",
+                    "What makes you so sure?",
+                    "And how does that make you feel?"
+                ]
+            },
+            {
+                pattern: /.*\b(no|nope|nah)\b.*/i,
+                response: [
+                    "Why not?",
+                    "Are you sure?",
+                    "What makes you say no?",
+                    "Could you explain your reasoning?",
+                    "Is there any situation where you might say yes?"
+                ]
+            },
+            {
+                pattern: /.*\b(friend|friends)\b.*/i,
+                response: [
+                    "Tell me more about your friends.",
+                    "How do your friends influence your life?",
+                    "What do you value most in friendship?",
+                    "How do you feel about your friendships?",
+                    "Do you find it easy to make friends?"
+                ]
+            },
+            {
+                pattern: /.*/,
+                response: [
+                    "Please tell me more about that.",
+                    "How does that make you feel?",
+                    "Can you elaborate on that?",
+                    "Why do you say that?",
+                    "I see. Go on.",
+                    "That's interesting. Can you tell me more?",
+                    "How do you feel when you think about that?",
+                    "What does that suggest to you?",
+                    "I understand. Please continue.",
+                    "Does talking about this bring up any particular feelings?"
+                ]
             }
         ];
 
@@ -72,15 +176,32 @@ class Eliza {
 
         // Show initial greeting
         this.addMessage("Hello! I'm ELIZA, a virtual psychotherapist. How are you feeling today?", 'eliza');
+
+        // Add to constructor
+        this.conversationContext = {
+            mentionedTopics: new Set(),
+            emotionalState: null,
+            lastMentionedPerson: null
+        };
     }
 
     handleUserInput() {
         const input = this.userInput.value.trim();
         if (input === '') return;
         
+        this.updateContext(input);
         this.addMessage(input, 'user');
+        
         const response = this.generateResponse(input);
-        setTimeout(() => this.addMessage(response, 'eliza'), 500);
+        const followUp = this.getFollowUpQuestion();
+        
+        setTimeout(() => {
+            this.addMessage(response, 'eliza');
+            if (followUp) {
+                setTimeout(() => this.addMessage(followUp, 'eliza'), 1000);
+            }
+        }, 500);
+        
         this.userInput.value = '';
     }
 
@@ -101,19 +222,65 @@ class Eliza {
         for (const {pattern, response} of this.patterns) {
             const match = input.match(pattern);
             if (match) {
-                let chosen = response[Math.floor(Math.random() * response.length)];
-                // Replace placeholders with captured groups
+                let selectedResponse = this.selectResponse(response, input);
+                
+                // Replace captured groups if they exist
                 for (let i = 1; i < match.length; i++) {
-                    chosen = chosen.replace(`$${i}`, match[i]);
+                    selectedResponse = selectedResponse.replace(`$${i}`, match[i]);
                 }
-                return chosen;
+                
+                return selectedResponse;
             }
         }
 
-        // If no pattern matches, use default response
-        return this.defaultResponses[
-            Math.floor(Math.random() * this.defaultResponses.length)
-        ];
+        return "I'm not sure I understand. Can you rephrase that?";
+    }
+
+    // Add this new method to improve response selection
+    selectResponse(responses, input) {
+        // Avoid repeating the last response if possible
+        if (!this.lastResponse) {
+            this.lastResponse = '';
+        }
+        
+        let availableResponses = responses.filter(r => r !== this.lastResponse);
+        if (availableResponses.length === 0) {
+            availableResponses = responses;
+        }
+        
+        const response = availableResponses[Math.floor(Math.random() * availableResponses.length)];
+        this.lastResponse = response;
+        return response;
+    }
+
+    // Add method to track context
+    updateContext(input) {
+        // Track mentioned topics
+        const topics = ['family', 'work', 'health', 'relationships'].filter(topic => 
+            input.toLowerCase().includes(topic)
+        );
+        topics.forEach(topic => this.conversationContext.mentionedTopics.add(topic));
+        
+        // Track emotional state
+        const emotions = {
+            positive: ['happy', 'glad', 'excited'],
+            negative: ['sad', 'angry', 'depressed']
+        };
+        for (const [state, words] of Object.entries(emotions)) {
+            if (words.some(word => input.toLowerCase().includes(word))) {
+                this.conversationContext.emotionalState = state;
+            }
+        }
+    }
+
+    getFollowUpQuestion() {
+        if (this.conversationContext.emotionalState === 'negative') {
+            return "Would you like to talk more about what's troubling you?";
+        }
+        if (this.conversationContext.mentionedTopics.has('family')) {
+            return "How do your family relationships affect other areas of your life?";
+        }
+        return null;
     }
 }
 
