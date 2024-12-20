@@ -1,3 +1,11 @@
+// The code follows the core pattern-matching principles of the original ELIZA:
+// Uses regular expressions for pattern matching
+// Implements response templates with variables
+// Maintains conversation context through simple substitution
+// Key research papers to reference:
+// Weizenbaum, J. (1966). "ELIZA—A Computer Program For the Study of Natural Language Communication Between Man and Machine"
+// Colby, K. M. (1975). "Artificial Paranoia: A Computer Simulation of Paranoid Process"
+
 class Eliza {
     constructor() {
         // Initialize chat history
