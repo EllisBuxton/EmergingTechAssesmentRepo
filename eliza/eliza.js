@@ -201,7 +201,7 @@ class Eliza {
         this.addMessage(input, 'user');
         
         const response = this.generateResponse(input);
-        const followUp = this.getFollowUpQuestion();
+        const followUp = Math.random() < 0.3 ? this.getFollowUpQuestion() : null;
         
         setTimeout(() => {
             this.addMessage(response, 'eliza');
