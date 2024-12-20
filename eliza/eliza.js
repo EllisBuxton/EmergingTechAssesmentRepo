@@ -83,11 +83,11 @@ class Eliza {
             {
                 pattern: /.*\b(depressed|sad|unhappy|miserable)\b.*/i,
                 response: [
-                    "I'm sorry to hear you're feeling this way. Can you tell me more about these feelings?",
-                    "How long have you been feeling like this?",
-                    "Do you know what might have triggered these feelings?",
-                    "Have you considered talking to a mental health professional about these feelings?",
-                    "What usually helps you when you feel this way?"
+                    "I hear that you're feeling down.",
+                    "That must be difficult to deal with.",
+                    "I'm listening. Can you tell me more?",
+                    "What do you think might help right now?",
+                    "How long have you been feeling this way?"
                 ]
             },
             {
@@ -201,7 +201,8 @@ class Eliza {
         this.addMessage(input, 'user');
         
         const response = this.generateResponse(input);
-        const followUp = Math.random() < 0.3 ? this.getFollowUpQuestion() : null;
+        const followUp = !response.includes('?') && Math.random() < 0.3 ? 
+            this.getFollowUpQuestion() : null;
         
         setTimeout(() => {
             this.addMessage(response, 'eliza');
